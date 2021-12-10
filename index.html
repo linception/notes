@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Sharon Lee 的笔记</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="Description">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <style type="text/css">
+  .markdown-section pre>code {
+    padding: 0.5em 5px;
+  }
+
+  .markdown-section pre {
+    padding: 0 0.4rem;
+  }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+  <!-- Mermaid -->
+  <script src="//cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <!-- Docsify v4 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  <!-- Code Highlight -->
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-csharp.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-java.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-markdown.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-nginx.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-properties.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-sql.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-xml-doc.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-yaml.min.js"></script>
+  <script>
+    var num = 0;
+    mermaid.initialize({ startOnLoad: false });
+
+    window.$docsify = {
+      name: "Sharon Lee 的笔记",
+      repo: 'https://gitee.com/sharonlee/notes',
+      auto2top: true,
+      nameLink: '#/',
+      loadNavbar: true,
+      relativePath: true,
+      loadSidebar: true,
+      subMaxLevel: 3,
+      markdown: {
+        renderer: {
+          code: function (code, lang) {
+            if (lang === "mermaid") {
+              return (
+                '<div class="mermaid">' + mermaid.render('mermaid-svg-' + num++, code) + "</div>"
+              );
+            }
+            return this.origin.code.apply(this, arguments);
+          },
+          html: function(html) {
+            // 处理 hash 情况下 html 中 img 相对路径
+            let domParser = new DOMParser();
+            dom = domParser.parseFromString(html, 'text/html');
+            let imgs = dom.querySelectorAll('img');
+            imgs.forEach(img => {
+              let src = img.getAttribute('src');
+              console.log(src)
+              // 绝对路径不处理
+              if (src.startsWith('http://')
+              || src.startsWith('https://')
+              || src.startsWith('/')) {
+                return;
+              }
+              // 从 hash 获取需要加上的路径
+              let relative = location.hash;
+              if (relative.startsWith('#')) {
+                relative = relative.substr(1);
+              }
+              if (relative.startsWith('/')) {
+                relative = relative.substr(1);
+              }
+              idx = relative.lastIndexOf('/');
+              if (idx != -1) {
+                relative = relative.substr(0, idx + 1)
+              }
+              img.setAttribute('src', relative + src);
+            });
+            return dom.querySelector('body').innerHTML;
+          }
+        }
+      }
+    }
+  </script>
+</body>
+
+</html>
